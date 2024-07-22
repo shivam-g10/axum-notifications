@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .notification-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .notification-box {
+            width: 50%;
+            min-height: 100vh;
+            border: 1px solid black
+        }
+        .notification-header {
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid black;
+        }
+        .notification-list {
+            width: 100%;
+            list-style: none;
+            margin-left: 0;
+            padding-left: 0;
+        }
+        .notification-list li {
+            padding: 10px 0;
+            width: 100%;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.5);
+        }
+        .send-message {
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="send-message">
+        <input type="text" /> <button onclick="sendMessage(event, 123)">Send Message</button>
+    </div>
+    <div class="notification-container">
+        <div data-type="sse" class="notification-box">
+            <div class="notification-header">
+                <h1>Server Sent Event</h1>
+            </div>
+            <ul class="notification-list"></ul>
+        </div>
+        <div data-type="websocket" class="notification-box">
+            <div class="notification-header">
+                <h1>Websocket</h1>
+            </div>
+            <ul class="notification-list"></ul>
+        </div>
+    </div>
+    <script src="./script.js"></script>
+    <script>
+        const sse = new ServerNotification('sse', 123);
+        const websocket = new ServerNotification('websocket', 123);
+        sse.start();
+        websocket.start();
+    </script>
+</body>
+</html>

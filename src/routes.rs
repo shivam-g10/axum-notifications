@@ -30,18 +30,20 @@ pub async fn send_notification_handler(
     Json(serde_json::json!({"status": 200}))
 }
 
+/// Handle Server Sent Event connection
 pub async fn sse_handler(
     State(state): State<Channels>,
     Path(user_id): Path<String>
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
 
-    // A `Stream` that repeats an event every second
-    //
-    // You can also create streams from tokio channels using the wrappers in
-    // https://docs.rs/tokio-stream
+    // Get broadcast receiver
     let broadcast_rx = state.tx.subscribe();
+    // clone user id to use in closures below
     let user_id_filter = user_id.clone();
+
+    // convert broadcast receiver into stream
     let stream = BroadcastStream::new(broadcast_rx)
+    // filter notifications for current user
     .filter(move |f| {
         let value = match f {
             Ok(notification) => notification,
@@ -49,6 +51,7 @@ pub async fn sse_handler(
         };
         return user_id_filter == value.user_id;
     })
+    // Format notifications into Server Sent Events
     .map(move |f| { 
         let user_id = user_id.to_string();
         let value = match f {
@@ -59,6 +62,7 @@ pub async fn sse_handler(
         Ok(Event::default().data(data))
     });
     
+    // Send response to client
     Sse::new(stream).keep_alive(
         axum::response::sse::KeepAlive::new()
             .interval(Duration::from_secs(1))
